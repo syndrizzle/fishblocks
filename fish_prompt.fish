@@ -192,6 +192,132 @@ function _block_pwd -d 'Returns PWD block'
 	echo $block
 end
 
+# Language detection block
+function _fishblocks_detect_language -d 'Detects programming language based on package manager files'
+	set -l language ""
+	
+	# Check for various package manager files in current directory
+	if test -f package.json
+		set language "nodejs"
+	else if test -f Cargo.toml
+		set language "rust"
+	else if test -f pyproject.toml; or test -f requirements.txt; or test -f setup.py; or test -f Pipfile
+		set language "python"
+	else if test -f composer.json
+		set language "php"
+	else if test -f Gemfile
+		set language "ruby"
+	else if test -f go.mod; or test -f go.sum
+		set language "go"
+	else if test -f pom.xml; or test -f build.gradle; or test -f build.gradle.kts
+		set language "java"
+	else if test -f mix.exs
+		set language "elixir"
+	else if test -f pubspec.yaml; or test -f pubspec.yml
+		set language "dart"
+	else if test -f Dockerfile
+		set language "docker"
+	else if test -f CMakeLists.txt
+		set language "cpp"
+	else if test -f Makefile; or test -f makefile
+		set language "make"
+	else if test -f deno.json; or test -f deno.jsonc
+		set language "deno"
+	else if test -f yarn.lock
+		set language "yarn"
+	else if test -f pnpm-lock.yaml
+		set language "pnpm"
+	else if test -f poetry.lock
+		set language "poetry"
+	else if test -f stack.yaml
+		set language "haskell"
+	else if test -f shard.yml
+		set language "crystal"
+	else if test -f Project.toml
+		set language "julia"
+	else if test -f rebar.config
+		set language "erlang"
+	else if test -f build.zig
+		set language "zig"
+	else if test -f "*.nimble"
+		set language "nim"
+	else if test -f flake.nix; or test -f default.nix
+		set language "nix"
+	end
+	
+	echo $language
+end
+
+function _fishblocks_language_icon -d 'Returns language icon based on detected language'
+	set -l language (_fishblocks_detect_language)
+	set -l icon ""
+	
+	switch $language
+		case nodejs
+			set icon ""  # Node.js icon
+		case rust
+			set icon ""  # Rust icon
+		case python
+			set icon ""  # Python icon
+		case php
+			set icon ""  # PHP icon
+		case ruby
+			set icon ""  # Ruby icon
+		case go
+			set icon ""  # Go icon
+		case java
+			set icon ""  # Java icon
+		case elixir
+			set icon ""  # Elixir icon
+		case dart
+			set icon ""  # Dart icon
+		case docker
+			set icon ""  # Docker icon
+		case cpp
+			set icon ""  # C++ icon
+		case make
+			set icon ""  # Make icon
+		case deno
+			set icon ""  # Deno icon (using emoji as fallback)
+		case yarn
+			set icon ""  # Yarn icon
+		case pnpm
+			set icon ""  # PNPM icon (using package icon)
+		case poetry
+			set icon ""  # Poetry (Python icon variant)
+		case haskell
+			set icon ""  # Haskell icon
+		case crystal
+			set icon ""  # Crystal icon
+		case julia
+			set icon ""  # Julia icon
+		case erlang
+			set icon ""  # Erlang icon
+		case zig
+			set icon ""  # Zig icon
+		case nim
+			set icon ""  # Nim icon
+		case nix
+			set icon "󱄅"  # Nix icon
+		case '*'
+			set icon ""
+	end
+	
+	echo $icon
+end
+
+function _block_language -d 'Returns language block'
+	set -l language (_fishblocks_detect_language)
+	set -l icon (_fishblocks_language_icon)
+	set -l block ""
+	
+	if test -n "$language"
+		set block (set_color -b red -o white)" $icon "
+	end
+	
+	echo $block
+end
+
 # ░█░░░█▀▀░█▀▀░▀█▀░░░░░█░█░█▀█░█▀█░█▀▄░░░█▀█░█▀▄░█▀█░█▄█░█▀█░▀█▀
 # ░█░░░█▀▀░█▀▀░░█░░▄▄▄░█▀█░█▀█░█░█░█░█░░░█▀▀░█▀▄░█░█░█░█░█▀▀░░█░
 # ░▀▀▀░▀▀▀░▀░░░░▀░░░░░░▀░▀░▀░▀░▀░▀░▀▀░░░░▀░░░▀░▀░▀▀▀░▀░▀░▀░░░░▀░
@@ -205,6 +331,6 @@ function fish_prompt
 			echo -ne '\033k[ '(prompt_pwd)' ]\033\\';
 	end
 
-	# Print right-hand prompt
-	echo (_block_icon)(_block_ssh)(_block_user_host)(_block_pwd)(set_color normal)' '
+	# Print left-hand prompt
+	echo (_block_icon)(_block_ssh)(_block_user_host)(_block_pwd)(_block_language)(set_color normal)' '
 end

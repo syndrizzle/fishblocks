@@ -30,14 +30,27 @@ end
 
 # Git block
 function _block_git -d 'Returns Git block'
-	if [ (fish_git_prompt) ]
+	set -l git_prompt (fish_git_prompt)
+	if [ "$git_prompt" ]
+		set -l ahead_behind (git rev-list --left-right --count '@{upstream}...HEAD' 2>/dev/null)
+		set -l behind (echo $ahead_behind | cut -f1)
+		set -l ahead (echo $ahead_behind | cut -f2)
+
+		set -l indicators
+		if [ $behind -gt 0 ]
+			set -a indicators "  $behind"
+		end
+		if [ $ahead -gt 0 ]
+			set -a indicators "  $ahead"
+		end
+
 		set git_bg (_fishblocks_git_status)
-		set block (fish_git_prompt)'  '
+		set block "$git_prompt$indicators  "
 	else
 		set git_bg normal
 		set block (fish_git_prompt)
 	end
-	echo (set_color -b $git_bg -o black) $block
+	echo (set_color -b $git_bg -o black)' '$block
 end
 
 # Override fish_default_mode_prompt and use the theme's custom prompt
