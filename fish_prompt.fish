@@ -111,11 +111,11 @@ function _fishblocks_distro_icon -d 'Returns linux distribution icon'
 		case '*nixos*'
 			set icon ''
 		case '*void*'
-			set icon ''
+			set icon '󰌽'
 		case '*artix*'
-			set icon ''
+			set icon '󰌽'
 		case '*'
-			set icon ''
+			set icon '󰌽'
 	end
 	echo $icon
 end
