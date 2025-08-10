@@ -33,15 +33,17 @@ function _block_git -d 'Returns Git block'
 	set -l git_prompt (fish_git_prompt)
 	if [ "$git_prompt" ]
 		set -l ahead_behind (git rev-list --left-right --count '@{upstream}...HEAD' 2>/dev/null)
-		set -l behind (echo $ahead_behind | cut -f1)
-		set -l ahead (echo $ahead_behind | cut -f2)
-
 		set -l indicators
-		if [ $behind -gt 0 ]
-			set -a indicators "  $behind"
-		end
-		if [ $ahead -gt 0 ]
-			set -a indicators "  $ahead"
+		if test -n "$ahead_behind"
+			set -l behind (echo $ahead_behind | cut -f1)
+			set -l ahead (echo $ahead_behind | cut -f2)
+
+			if [ $behind -gt 0 ]
+				set -a indicators "  $behind"
+			end
+			if [ $ahead -gt 0 ]
+				set -a indicators "  $ahead"
+			end
 		end
 
 		set git_bg (_fishblocks_git_status)
